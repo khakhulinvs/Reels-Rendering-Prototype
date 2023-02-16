@@ -22,25 +22,27 @@ class Spill : CIFilter {
     
     static let kernels = CIKernel.makeKernels(source:
         """
-        kernel vec4 applyMaskKernel(sampler image, float texelX, float texelY) {
+        kernel vec4 applyMaskKernel(sampler image, int spillDepth, float spillThreshold, float texelX, float texelY) {
             vec2 coord = samplerCoord(image);
         
-            int iDepth = 32;
+            int iDepth = spillDepth;
             float fDepth = float(iDepth);
             float fDepthSqr = fDepth * fDepth;
         
-            for (int x = 0; x < iDepth; x++) {
-                float offsetX = float(x) * texelX;
-                for (int y = 0; y < iDepth; y++) {
-                    float offsetY = float(y) * texelY;
+            for (int x = -iDepth; x <= iDepth; x++) {
+                float fx = float(x);
+                float offsetX = fx * texelX;
+                for (int y = -iDepth; y <= iDepth; y++) {
+                    float fy = float(y);
+                    float offsetY = fy * texelY;
         
-                    float distSqr = offsetX * offsetX + offsetY * offsetY;
+                    float distSqr = fx * fx + fy * fy;
                     if (distSqr > fDepthSqr) {
                         continue;
                     }
                     
                     float color = sample(image, coord + vec2(offsetX, offsetY)).r;
-                    if (color > 0.5) {
+                    if (color > spillThreshold) {
                         return vec4(1.0);
                     }
                 }
@@ -55,6 +57,8 @@ class Spill : CIFilter {
     }
 
     var inputImage: CIImage?
+    var spillDepth: Int = 16
+    var spillThreshold: Float = 0.1
     
     override var outputImage: CIImage? {
         guard let inputImage = inputImage else {
@@ -65,6 +69,6 @@ class Spill : CIFilter {
             roiCallback: { _, rect in
                 return rect
             },
-            arguments: [inputImage, 1.0 / inputImage.extent.width, 1.0 / inputImage.extent.height])
+            arguments: [inputImage, spillDepth, spillThreshold, 1.0 / inputImage.extent.width, 1.0 / inputImage.extent.height])
       }
 }

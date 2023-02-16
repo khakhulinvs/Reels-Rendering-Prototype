@@ -16,18 +16,31 @@ class PhotoProcessor {
     private func processPhoto(index: Int) {
         let photo = photos[index]
         
-        guard let originalImage = photo.original else {
+        guard let originalUIImage = photo.original,
+              let originalCIImage = CIImage(image: originalUIImage) else {
             return
         }
         
-        segmentator.predict(uiImage: originalImage, orientation: .up) { [weak self] result, resultType in
+        segmentator.predict(uiImage: originalUIImage, orientation: .up) { [weak self] result, resultType in
             guard resultType == .CVPixelBuffer else {
                 print("[PhotoProcessor] Segmentator result is not CVPixelBuffer")
                 return
             }
             let pixelBuffer = result as! CVPixelBuffer
             var mask = CIImage(cvPixelBuffer: pixelBuffer)
-            
+
+            // Resize mask to original image size
+            if let resizedMask = mask.resized(to: originalCIImage.extent.size) {
+                mask = resizedMask
+            }
+
+            // Binarize mask
+            let binarize = Binarize()
+            binarize.inputImage = mask
+            if let filterMask = binarize.outputImage {
+                mask = filterMask
+            }
+
             // Gauss blur mask
 //            if let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur") {
 //                gaussianBlurFilter.setValue(mask, forKey: kCIInputImageKey)
@@ -36,10 +49,19 @@ class PhotoProcessor {
 //                    mask = blurredMask
 //                }
 //            }
-
+            
+            // CIMorphologyMinimum
+//            if let maskFilter = CIFilter(name: "CIMorphologyMinimum") {
+//                maskFilter.setValue(mask, forKey: kCIInputImageKey)
+//                maskFilter.setValue(8, forKey: kCIInputRadiusKey)
+//                if let filteredMask = maskFilter.outputImage {
+//                    mask = filteredMask
+//                }
+//            }
+            
             // Mask image
             let applyMaskFilter = ApplyMask()
-            applyMaskFilter.inputImage = CIImage(image: originalImage)
+            applyMaskFilter.inputImage = originalCIImage
             applyMaskFilter.inputMask = mask
             let maskedImage = applyMaskFilter.outputImage
             if maskedImage == nil {
@@ -50,14 +72,14 @@ class PhotoProcessor {
             // Detect edges
             let edgeDetect = EdgeDetect()
             edgeDetect.inputImage = mask
-            edgeDetect.threshold = 0.1
+            edgeDetect.threshold = 0.05
             let edges = edgeDetect.outputImage
             if edges == nil {
                 print("[PhotoProcessor] Failed to detect edges image")
             }
-            photo.edges = edges?.resized(to: originalImage.size)
+            photo.edges = edges
             
-            // Spill esges
+            // Spill edges
             let spillFilter = Spill()
             spillFilter.inputImage = photo.edges
             let spillImage = spillFilter.outputImage

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84B84F63299E909000D301D7 /* Binarize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B84F62299E909000D301D7 /* Binarize.swift */; };
 		84F8C03F299A28D00063E96F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F8C03E299A28D00063E96F /* AppDelegate.swift */; };
 		84F8C042299A28D00063E96F /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F8C041299A28D00063E96F /* Renderer.swift */; };
 		84F8C044299A28D00063E96F /* RenderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F8C043299A28D00063E96F /* RenderViewController.swift */; };
@@ -57,6 +58,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		84B84F62299E909000D301D7 /* Binarize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Binarize.swift; sourceTree = "<group>"; };
 		84F8C03B299A28D00063E96F /* iOSTestTask.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSTestTask.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84F8C03E299A28D00063E96F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84F8C040299A28D00063E96F /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				84F8C0A5299CEDB70063E96F /* RGBToHSV.swift */,
 				84F8C0B2299D4BF00063E96F /* EdgeDetect.swift */,
 				84F8C0AB299D012B0063E96F /* ApplyMask.swift */,
+				84B84F62299E909000D301D7 /* Binarize.swift */,
 				84F8C0B6299D50A50063E96F /* Spill.swift */,
 			);
 			path = CoreImage;
@@ -405,6 +408,7 @@
 				84F8C074299B627E0063E96F /* Animation.swift in Sources */,
 				84F8C0B1299D07100063E96F /* ProcessedPhoto.swift in Sources */,
 				84F8C060299A46960063E96F /* Drawable.swift in Sources */,
+				84B84F63299E909000D301D7 /* Binarize.swift in Sources */,
 				84F8C0A3299CED830063E96F /* CGImage+.swift in Sources */,
 				84F8C0B5299D4F360063E96F /* CIImage+.swift in Sources */,
 				84F8C0AC299D012B0063E96F /* ApplyMask.swift in Sources */,

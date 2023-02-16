@@ -1,5 +1,5 @@
 //
-//  ApplyMask.swift
+//  Binarize.swift
 //  iOSTestTask
 //
 //  Created by Viacheslav Khakhulin on 15.02.2023.
@@ -7,18 +7,13 @@
 
 import CoreImage
 
-class ApplyMask : CIFilter {
+class Binarize : CIFilter {
     override var attributes: [String : Any]
         {
             return [
-                kCIAttributeFilterDisplayName: "ApplyMask",
+                kCIAttributeFilterDisplayName: "Binarize",
                 
                 "inputImage": [kCIAttributeIdentity: 0,
-                    kCIAttributeClass: "CIImage",
-                    kCIAttributeDisplayName: "Image",
-                    kCIAttributeType: kCIAttributeTypeImage],
-
-                "maskImage": [kCIAttributeIdentity: 0,
                     kCIAttributeClass: "CIImage",
                     kCIAttributeDisplayName: "Image",
                     kCIAttributeType: kCIAttributeTypeImage],
@@ -27,10 +22,9 @@ class ApplyMask : CIFilter {
     
     static let kernels = CIKernel.makeKernels(source:
         """
-        kernel vec4 applyMaskKernel(sampler image, sampler mask) {
-            vec3 rgb = sample(image, samplerCoord(image)).rgb;
-            float alpha = sample(mask, samplerCoord(mask)).r;
-            return vec4(rgb, alpha);
+        kernel vec4 binarizeKernel(sampler image) {
+            vec4 rgba = sample(image, samplerCoord(image));
+            return vec4(float(rgba.r > 0.5));
         }
         """
     )!
@@ -39,18 +33,16 @@ class ApplyMask : CIFilter {
     }
 
     var inputImage: CIImage?
-    var inputMask: CIImage?
     
     override var outputImage: CIImage? {
-        guard let inputImage = inputImage,
-              let inputMask = inputMask else {
+        guard let inputImage = inputImage else {
             return nil
         }
-        return ApplyMask.kernel.apply(
+        return Binarize.kernel.apply(
             extent: inputImage.extent,
             roiCallback: { _, rect in
                 return rect
             },
-            arguments: [inputImage, inputMask])
+            arguments: [inputImage])
       }
 }
